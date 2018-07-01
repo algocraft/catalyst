@@ -377,13 +377,14 @@ class ExchangeTradingAlgorithmBacktest(ExchangeTradingAlgorithmBase):
             return False
 
     def handle_data(self, data):
+        self._skip_tick = False
         super(ExchangeTradingAlgorithmBacktest, self).handle_data(data)
-
-        if self.data_frequency == 'minute':
-            frame_stats = self.prepare_period_stats(
-                data.current_dt, data.current_dt + timedelta(minutes=1)
-            )
-            self.frame_stats.append(frame_stats)
+        if not self._skip_tick:
+          if self.data_frequency == 'minute':
+              frame_stats = self.prepare_period_stats(
+                  data.current_dt, data.current_dt + timedelta(minutes=1)
+              )
+              self.frame_stats.append(frame_stats)
 
         self.current_day = data.current_dt.floor('1D')
 

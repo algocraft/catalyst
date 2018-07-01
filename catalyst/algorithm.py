@@ -2530,6 +2530,14 @@ class TradingAlgorithm(object):
     # End Pipeline API
     ##################
 
+
+    ##################
+    # Algocraft API
+    ##################
+    @api_method
+    def skip_tick(self, *args, **kwargs):
+        self._skip_tick = True
+
     @classmethod
     def all_api_methods(cls):
         """
