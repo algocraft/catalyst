@@ -153,7 +153,7 @@ def _run(handle_data,
         'https://github.com/enigmampc/catalyst/issues'
     )
     log.info('Catalyst version {}'.format(catalyst.__version__))
-    sleep(3)
+    #sleep(3)
 
     if live:
         if simulate_orders:
