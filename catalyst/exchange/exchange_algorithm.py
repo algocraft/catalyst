@@ -153,17 +153,17 @@ class ExchangeTradingAlgorithmBase(TradingAlgorithm):
             self.blotter.commission_models[key].taker = taker
 
     @api_method
-    def set_slippage(self, spread=None):
-        """Set the spread of the slippage model for the simulation.
+    def set_slippage(self, slippage=None):
+        """Set the slippage of the fixed slippage model used by the simulation.
 
         Parameters
         ----------
-        spread : float
-            The spread to be set.
+        slippage : float
+            The slippage to be set.
         """
         key = list(self.blotter.slippage_models.keys())[0]
-        if spread is not None:
-            self.blotter.slippage_models[key].spread = spread
+        if slippage is not None:
+            self.blotter.slippage_models[key].slippage = slippage
 
     def _calculate_order(self, asset, amount,
                          limit_price=None, stop_price=None, style=None):
@@ -221,17 +221,17 @@ class ExchangeTradingAlgorithmBase(TradingAlgorithm):
     @api_method
     @preprocess(symbol_str=ensure_upper_case)
     def symbol(self, symbol_str, exchange_name=None):
-        """Lookup a TradingPair by its ticker symbol.
+        """Lookup a Trading pair by its ticker symbol.
         Catalyst defines its own set of "universal" symbols to reference
         trading pairs across exchanges. This is required because exchanges
         are not adhering to a universal symbolism. For example, Bitfinex
         uses the BTC symbol for Bitcon while Kraken uses XBT. In addition,
         pairs are sometimes presented differently. For example, Bitfinex
         puts the market currency before the base currency without a
-        separator, Bittrex puts the base currency first and uses a dash
+        separator, Bittrex puts the quote currency first and uses a dash
         seperator.
 
-        Here is the Catalyst convention: [Market Currency]_[Base Currency]
+        Here is the Catalyst convention: [Base Currency]_[Quote Currency]
         For example: btc_usd, eth_btc, neo_eth, ltc_eur.
 
         The symbol for each currency (e.g. btc, eth, ltc) is generally
@@ -1106,10 +1106,7 @@ class ExchangeTradingAlgorithmLive(ExchangeTradingAlgorithmBase):
         execution_price: float
             The execution price per unit of the order if return_price is True
         """
-        exchange_name = [self.blotter.orders[id_order].asset.exchange
-                         for id_order in self.blotter.orders
-                         if order_id == id_order
-                         ][0]
+        exchange_name = self.blotter.orders[order_id].asset.exchange
         exchange = self.exchanges[exchange_name]
         return retry(
             action=exchange.get_order,
@@ -1140,10 +1137,7 @@ class ExchangeTradingAlgorithmLive(ExchangeTradingAlgorithmBase):
             order_id = order_param.id
 
         if not self.simulate_orders:
-            exchange_name = [self.blotter.orders[id_order].asset.exchange
-                             for id_order in self.blotter.orders
-                             if order_id == id_order
-                             ][0]
+            exchange_name = self.blotter.orders[order_id].asset.exchange
             exchange = self.exchanges[exchange_name]
             retry(
                 action=exchange.cancel_order,
